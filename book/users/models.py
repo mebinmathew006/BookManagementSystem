@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 class UserManger(BaseUserManager):
     def create_user(self,email,password,**extra_fields):
@@ -18,7 +19,7 @@ class UserManger(BaseUserManager):
 
 class User(AbstractBaseUser):
     name = models.CharField(max_length=50)
-    profile_image = models.TextField()
+    profile_image = models.ImageField(upload_to='profile_images/',storage=MediaCloudinaryStorage())
     email = models.EmailField(unique=True)
     
     USERNAME_FIELD = 'email'
