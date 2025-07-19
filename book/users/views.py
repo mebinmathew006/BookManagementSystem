@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.core.exceptions import ValidationError
-from .serializers import UserSignupSerializer,LoginSerializer
+from .serializers import UserSignupSerializer,LoginSerializer,UserProfileUpdateSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
@@ -122,7 +122,7 @@ class Profile(APIView):
     def get(self,request):
         try :
             user = request.user
-               
+            
             user_data = {
                 "id": user.id,
                 "email": user.email,
@@ -145,4 +145,35 @@ class Profile(APIView):
                  "status":'Error',  
                  "message":"An unexpected error happend"
             },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+            
+            
+    def put (self, request):
+        try:
+            user = request.user
+            serializer = UserProfileUpdateSerializer(user,data=request.data,partial=True)
+            if not serializer.is_valid():
+                return Response(
+                    {
+                        "status":"error",
+                        "message":"User Profile Updation validation failed",
+                        "errors": serializer.errors
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            serializer.save()
+            
+            return Response(
+                    {
+                        "status":'success',
+                        "message":'Updation Successful',
+                       
+                    },
+                    status= status.HTTP_200_OK
+                )
+        except Exception as e :
+            logger.critical(f"Unexpected Error {str(e)}")
+            return Response (
+                { 
+                 "status":'Error',  
+                 "message":"An unexpected error happend"
+            },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
