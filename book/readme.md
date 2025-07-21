@@ -89,7 +89,7 @@ Reading List
 
 Method	Endpoint	Description
 POST	/books/readinglist	Create new reading list
-GET	/books/readinglist	List user's reading lists
+GET	/books/readinglist	List users reading lists
 PUT	/books/readinglist/{id}/	Update reading list
 DELETE	/books/{id}/	Delete a reading list
 
@@ -97,7 +97,7 @@ Reading List Items
 
 Method	Endpoint	Description
 POST	/books/readingitem/{id}/	Add new book to list
-GET	/books/readingitem/{id}/	List user's reading books
+GET	/books/readingitem/{id}/	List users reading books
 PATCH	/books/readingitem/{id}/	Update reading list order
 DELETE	/books/readingitem/{id}/	Delete a book from reading list
 
