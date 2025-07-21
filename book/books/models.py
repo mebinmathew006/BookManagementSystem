@@ -19,8 +19,13 @@ class Books(models.Model):
     
     
 class ReadingList(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='readinglists')
-    created_at =models.DateField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='readinglists')
+    name = models.CharField(max_length=100)  
+    created_at = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.user.username})"
+
     
 class ReadingItem(models.Model):
     readinglist = models.ForeignKey(ReadingList,on_delete=models.CASCADE,related_name='readingitems')

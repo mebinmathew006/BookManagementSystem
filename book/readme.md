@@ -8,7 +8,7 @@ A RESTful API built using Django and Django REST Framework to manage users, book
 
 ### 👤 User Management
 - User registration with email and username (both unique)
-- Secure login using token-based authentication (JWT recommended)
+- Secure login using token-based authentication (JWT)
 - User profile management (update profile details)
 
 ### 📘 Book Management
@@ -19,8 +19,8 @@ A RESTful API built using Django and Django REST Framework to manage users, book
 
 ### 📂 Reading List
 - Users can:
-  - Create and manage multiple reading lists
-  - Add books to their reading lists in a preferred order
+  - Create and manage reading lists
+  - Add books to their reading list in a preferred order
   - Remove books from reading lists
 
 ### ⚙️ Error Handling
@@ -32,7 +32,7 @@ A RESTful API built using Django and Django REST Framework to manage users, book
 ## 🛠️ Tech Stack
 
 - **Backend**: Django, Django REST Framework
-- **Authentication**: JWT or Token Authentication (via `djangorestframework-simplejwt` or DRF tokens)
+- **Authentication**: JWT or Token Authentication (via `djangorestframework-simplejwt` )
 - **Database**: SQLite (dev), PostgreSQL (prod-ready)
 - **Serialization**: Django REST Framework Serializers
 - **Image Uploads**: Django `ImageField` with proper media handling
@@ -43,96 +43,100 @@ A RESTful API built using Django and Django REST Framework to manage users, book
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/yourusername/book-management.git
-cd book-management
+git clone https://github.com/mebinmathew006/BookManagementSystem.git
+cd BookManagementSystem
 
 2. Create virtual environment and activate it
 
     python -m venv venv
     source venv/bin/activate   # On Windows: venv\Scripts\activate
 3. Install dependencies
-bash
-Copy
-Edit
+
 pip install -r requirements.txt
 4. Apply migrations
-bash
-Copy
-Edit
+
 python manage.py migrate
 5. Run the server
-bash
-Copy
-Edit
+
 python manage.py runserver
 🔐 API Authentication
-This project uses token-based authentication (you can switch to JWT).
+This project uses jwt-based authentication .
 
-Obtain token:
 
-bash
-Copy
-Edit
-POST /api/token/
-{
-  "email": "user@example.com",
-  "password": "yourpassword"
-}
 Use the token in headers for authenticated requests:
 
-makefile
-Copy
-Edit
+
 Authorization: Bearer <your_token>
-🔀 API Endpoints (Sample)
+
+🔀 API Endpoints 
 Users
+
 Method	Endpoint	Description
 POST	/users/signup/	Register new user
 POST	/users/login/	Login and get token
-GET	/users/me/	Get current user info
-PUT	/users/me/	Update profile
+GET	/users/profile/	Get current user info
+PUT	/users/profile/	Update profile
 
 Books
+
 Method	Endpoint	Description
-GET	/books/	List all books
-POST	/books/	Create a new book
-PUT	/books/{id}/	Update a book
-DELETE	/books/{id}/	Delete a book
+GET	/books/upload	List all books
+POST	/books/upload	Create a new book
+PUT	/books/upload/{id}/	Update a book
+DELETE	/books/upload/{id}/	Delete a book
 
 Reading List
+
 Method	Endpoint	Description
-POST	/reading-lists/	Create new reading list
-GET	/reading-lists/	List user's reading lists
-PUT	/reading-lists/{id}/	Update reading list name
-DELETE	/reading-lists/{id}/	Delete a reading list
-POST	/reading-lists/{id}/add/	Add a book to reading list
-POST	/reading-lists/{id}/remove/	Remove book from list
+POST	/books/readinglist	Create new reading list
+GET	/books/readinglist	List user's reading lists
+PUT	/books/readinglist/{id}/	Update reading list
+DELETE	/books/{id}/	Delete a reading list
+
+Reading List Items
+
+Method	Endpoint	Description
+POST	/books/readingitem/{id}/	Add new book to list
+GET	/books/readingitem/{id}/	List user's reading books
+PATCH	/books/readingitem/{id}/	Update reading list order
+DELETE	/books/readingitem/{id}/	Delete a book from reading list
+
+
 
 📁 Folder Structure (Suggested)
-bash
-Copy
-Edit
 book_management/
-│
-├── users/
-│   ├── models.py
-│   ├── serializers.py
-│   ├── views.py
-│   └── urls.py
-│
-├── books/
-│   ├── models.py
-│   ├── serializers.py
-│   ├── views.py
-│   └── urls.py
-│
-├── readinglists/
-│   ├── models.py
-│   ├── serializers.py
-│   ├── views.py
-│   └── urls.py
-│
-├── media/
-├── requirements.txt
-├── manage.py
-└── README.md
+└─book/
+  │
+  ├── users/
+  │   ├── models.py
+  │   ├── serializers.py
+  │   ├── views.py
+  │   └── urls.py
+  │
+  ├── books/
+  │   ├── models.py
+  │   ├── serializers.py
+  │   ├── views.py
+  │   └── urls.py
+  │
+  ├── requirements.txt
+  ├── manage.py
+  └── README.md
+  
+
+
+
+
+### 📂 sample env strcture
+
+
+SECRET_KEY = ''
+DEBUG = True
+DATABASES_NAME=''
+DATABASES_HOST=127.0.0.1
+DATABASES_PORT= ''
+DATABASES_USER =''
+DATABASES_PASSWORD=' '
+CLOUDINARY_API_KEY=''
+CLOUDINARY_SECRET_KEY=''
+CLOUD_NAME=' '
