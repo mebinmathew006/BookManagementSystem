@@ -7,17 +7,15 @@ from django.core.exceptions import ValidationError
 from .serializers import UserSignupSerializer,LoginSerializer,UserProfileUpdateSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User
 logger = logging.getLogger(__name__)
 
+
 class UserSignupView(APIView):
-    
-    permission_classes = [AllowAny]  
+    permission_classes = [AllowAny] 
+     
     def post(self, request):
-       
         try:
             serializer = UserSignupSerializer(data=request.data)
-            
             if not serializer.is_valid():
                 logger.warning(f"User signup validation failed: {serializer.errors}")
                 return Response(
@@ -28,9 +26,7 @@ class UserSignupView(APIView):
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-
             serializer.save()
-            
             logger.info("New user registered successfully")
             return Response(
                 {
@@ -40,7 +36,6 @@ class UserSignupView(APIView):
                 },
                 status=status.HTTP_201_CREATED,
             )
-
         except ValidationError as e:
             logger.error(f"Validation error during user signup: {str(e)}")
             return Response(
@@ -51,7 +46,6 @@ class UserSignupView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
         except Exception as e:
             logger.critical(f"Unexpected error in UserSignupView: {str(e)}", exc_info=True)
             return Response(
@@ -66,10 +60,10 @@ class UserSignupView(APIView):
    
 class Login(APIView):
     permission_classes = [AllowAny]  
+    
     def post(self, request):
         try:
             serializer = LoginSerializer(data=request.data)
-            
             if not serializer.is_valid():
                 return Response(
                     {
@@ -95,7 +89,6 @@ class Login(APIView):
                     },
                     status= status.HTTP_200_OK
                 )
-                
                 return response
             return Response(
                     {
@@ -105,7 +98,6 @@ class Login(APIView):
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
         except Exception as e :
             logger.critical(f"Unexpected Error in Login {str(e)}")
             
@@ -117,12 +109,12 @@ class Login(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
+            
 class Profile(APIView):
     permission_classes = [IsAuthenticated] 
     def get(self,request):
         try :
             user = request.user
-            
             user_data = {
                 "id": user.id,
                 "email": user.email,
@@ -161,7 +153,6 @@ class Profile(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             serializer.save()
-            
             return Response(
                     {
                         "status":'success',

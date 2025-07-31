@@ -3,16 +3,21 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import BookSerializer,ReadingItemSerializer,ReadingItemCreateSerializer,ReadingListSerializer
 from .models import Books,ReadingList,ReadingItem
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 logger = logging.getLogger(__name__)
+from .serializers import (
+    BookSerializer,
+    ReadingItemSerializer,
+    ReadingItemCreateSerializer,
+    ReadingListSerializer,
+)
 
 
 class UserUploadBook(APIView):
-    
     permission_classes = [IsAuthenticated]
+    
     def post (self,request):
         try:
             serializer = BookSerializer(data=request.data)
@@ -34,7 +39,6 @@ class UserUploadBook(APIView):
                 },
                 status= status.HTTP_201_CREATED
             )
-                
         except Exception as e:
             logger.critical(f"Something Happened,{str(e)}")
             return Response(
@@ -54,7 +58,6 @@ class UserUploadBook(APIView):
                      'message':  "Book ID is required"
                      }, 
                     status=status.HTTP_400_BAD_REQUEST)
-
             book = Books.objects.get(pk=book_id, author=request.user)
             book.delete()
             return Response(
@@ -102,6 +105,7 @@ class UserUploadBook(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
+            
 class UserReadingList(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -122,7 +126,12 @@ class UserReadingList(APIView):
     def put(self, request, list_id):
         """Update an existing reading list"""
         readinglist = get_object_or_404(ReadingList, pk=list_id, user=request.user)
-        serializer = ReadingListSerializer(readinglist, data=request.data, partial=True, context={'request': request})
+        serializer = ReadingListSerializer(
+            readinglist, 
+            data=request.data, 
+            partial=True, 
+            context={'request': request}
+        )
         if serializer.is_valid():
             serializer.save()
             return Response({'status': 'success', 'data': serializer.data}, status=status.HTTP_200_OK)
@@ -132,8 +141,13 @@ class UserReadingList(APIView):
         """Delete a reading list"""
         readinglist = get_object_or_404(ReadingList, pk=list_id, user=request.user)
         readinglist.delete()
-        return Response({'status': 'success', 'message': 'Reading list deleted.'}, status=status.HTTP_204_NO_CONTENT)
-            
+        return Response(
+            {
+                'status': 'success',
+                'message': 'Reading list deleted.'
+            },
+            status=status.HTTP_204_NO_CONTENT
+        )
 class UserReadingListItem(APIView):
     permission_classes = [IsAuthenticated]
 
