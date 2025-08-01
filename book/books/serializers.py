@@ -58,6 +58,7 @@ class ReadingItemCreateSerializer(serializers.Serializer):
         readinglist = self.context.get('readinglist')
         book = validated_data['book']
         order = readinglist.readingitems.count() + 1
+        print(order,readinglist.readingitems.count())
         return ReadingItem.objects.create(
             readinglist=readinglist,
             book=book,
