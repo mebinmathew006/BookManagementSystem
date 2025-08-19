@@ -15,14 +15,13 @@ from .serializers import (
     ReadingItemCreateSerializer,
     ReadingListSerializer,
 )
-from django.db import IntegrityError
 
 logger = logging.getLogger(__name__)
 
 
 class Pagination(PageNumberPagination):
-    page_size = 10  # Default items per page
-    page_size_query_param = 'page_size'  # Optional override via query param
+    page_size = 10 
+    page_size_query_param = 'page_size'  
     max_page_size = 100
 
 class UserUploadBook(APIView):
@@ -41,6 +40,17 @@ class UserUploadBook(APIView):
                     status= status.HTTP_400_BAD_REQUEST
                 )
             # Save book with the current authenticated user as author
+            
+            title = serializer.validated_data.get("title")
+
+            if Books.objects.filter(title=title, author=request.user).exists():
+                return Response(
+                    {
+                        'status': 'error',
+                        "message": "You have already added a book with this title",
+                    },
+                    status=status.HTTP_409_CONFLICT  
+                )
             serializer.save(author=request.user)
             return Response(
                 {
@@ -97,13 +107,14 @@ class UserUploadBook(APIView):
     def get(self, request):
         try:
             books = Books.objects.all()
+            
             serialized_books = BookSerializer(books, many=True)
             return Response(
                     {
                         'status':'success',
                         "Books":serialized_books.data
                     },
-                    status= status.HTTP_400_BAD_REQUEST
+                    status= status.HTTP_200_OK
                 )
         except Exception as e :
             logger.critical(f"An unexpected error happend {str(e)}")
