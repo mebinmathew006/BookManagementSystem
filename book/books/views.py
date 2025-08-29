@@ -85,7 +85,7 @@ class UserUploadBook(APIView):
                     'status':'success',
                     "message": "Book deleted successfully"
                     }, 
-                status=status.HTTP_204_NO_CONTENT)
+                status=status.HTTP_200_OK)
         except Books.DoesNotExist:
             return Response(
                 {
@@ -167,15 +167,24 @@ class UserReadingList(APIView):
 
     def delete(self, request, list_id):
         """Delete a reading list"""
-        readinglist = get_object_or_404(ReadingList, pk=list_id, user=request.user)
-        readinglist.delete()
-        return Response(
-            {
-                'status': 'success',
-                'message': 'Reading list deleted.'
-            },
-            status=status.HTTP_204_NO_CONTENT
-        )
+        try:
+            readinglist = get_object_or_404(ReadingList, pk=list_id, user=request.user)
+            readinglist.delete()
+            return Response(
+                {
+                    'status': 'success',
+                    'message': 'Reading list deleted.'
+                },
+                status=status.HTTP_200_OK
+            )
+            
+        except Http404:
+            return Response({'status': 'error', 'message': 'Reading list not found.'},
+                        status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'status': 'error', 'message': 'Unexpected error occurred.'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class UserReadingListItem(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -284,7 +293,15 @@ class UserReadingListItem(APIView):
 
 
     def delete(self, request, list_id):
+        
         try:
+            try:
+                get_object_or_404(ReadingList,id = list_id,user=request.user)
+                
+            except Http404:
+                return Response({'status': 'error', 'message': 'Reading List not found.'},
+                                status=status.HTTP_404_NOT_FOUND)
+                
             item_id = request.data.get('item_id')
             if not item_id:
                 return Response({'status': 'error', 'message': 'item_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -292,9 +309,7 @@ class UserReadingListItem(APIView):
             with transaction.atomic():  
                 item = get_object_or_404(
                     ReadingItem,
-                    id=item_id,
-                    readinglist__id=list_id,
-                    readinglist__user=request.user
+                    id=item_id
                 )
 
                 readinglist = item.readinglist
@@ -307,10 +322,10 @@ class UserReadingListItem(APIView):
                 ReadingItem.objects.bulk_update(remaining_items, ['order'])
 
             return Response({'status': 'success', 'message': 'Item deleted and order updated.'},
-                            status=status.HTTP_204_NO_CONTENT)
+                            status=status.HTTP_200_OK)
 
         except Http404:
-            return Response({'status': 'error', 'message': 'Reading list not found.'},
+            return Response({'status': 'error', 'message': 'Reading item not found.'},
                             status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:

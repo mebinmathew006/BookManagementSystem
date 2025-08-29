@@ -28,4 +28,6 @@ class User(AbstractBaseUser):
     
     objects = UserManger()
         
+    def __str__(self):
+        return self.name
     

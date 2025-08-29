@@ -12,8 +12,8 @@ class UserSignupSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate_name(self,value):
-        if not re.match(r'^[A-Za-z]+$', value):  
-            raise serializers.ValidationError("Name must contain only letters.")
+        if not re.match(r'^[A-Za-z\s]+$', value):  
+            raise serializers.ValidationError("Name must contain only letters and spaces.")
         return value
     
     def validate_email(self, value):
@@ -54,7 +54,15 @@ class LoginSerializer(serializers.Serializer):
          
          
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    profile_image = serializers.ImageField()
     class Meta:
         model = User
         fields = ['name', 'profile_image']
         
+        
+    def validate_name(self,value):
+        print(value)
+        if not re.match(r'^[A-Za-z\s]+$', value):  
+            raise serializers.ValidationError("Name must contain only letters and spaces.")
+
+        return value

@@ -4,9 +4,10 @@ import re
 
 
 class BookSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = Books
-        fields =['id', 'title', 'book', 'genre', 'description']
+        fields =['id', 'title', 'book', 'genre', 'description','author']
         
     def validate_book(self, value):
         if not value.name.lower().endswith('.pdf'):
@@ -34,12 +35,14 @@ class ReadingListSerializer(serializers.ModelSerializer):
     
     def validate_name(self, value):
         user = self.context['request'].user
-        qs = ReadingList.objects.filter(user=user, name=value)
+        name = value.capitalize()
+        qs = ReadingList.objects.filter(user=user, name=name)
         if self.instance:
             qs = qs.exclude(pk=self.instance.pk)  
         if qs.exists():
             raise serializers.ValidationError("You already have a reading list with this name.")
-        return value
+        
+        return name
 
     
 class ReadingItemCreateSerializer(serializers.Serializer):
