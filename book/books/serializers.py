@@ -43,22 +43,28 @@ class ReadingListSerializer(serializers.ModelSerializer):
 
     
 class ReadingItemCreateSerializer(serializers.Serializer):
-    book = serializers.PrimaryKeyRelatedField(queryset=Books.objects.all())
-
+    book_id = serializers.IntegerField()
+    
     def validate(self, data):
         readinglist = self.context.get('readinglist')
-        book = data.get('book')
+        book_id = data.get('book_id')
+        try:
+            book = Books.objects.get(id=book_id)
+        except Books.DoesNotExist:
+            raise serializers.ValidationError({'book': 'The Book does not exist.'})
+            
         if ReadingItem.objects.filter(readinglist=readinglist, book=book).exists():
             raise serializers.ValidationError({
                 'book': 'This book is already in your reading list.'
             })
+        data['book']=book
         return data
 
     def create(self, validated_data):
         readinglist = self.context.get('readinglist')
         book = validated_data['book']
         order = readinglist.readingitems.count() + 1
-        print(order,readinglist.readingitems.count())
+
         return ReadingItem.objects.create(
             readinglist=readinglist,
             book=book,
